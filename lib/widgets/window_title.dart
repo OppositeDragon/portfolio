@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:portfolio/controllers/window_controller.dart';
-import 'package:portfolio/widgets/window/resizable_draggable_window.dart';
+import 'package:portfolio/widgets/resizable_draggable_window.dart';
 
 class WindowTitle extends ConsumerWidget {
-  const WindowTitle(this.parentKey, {super.key});
-  final Key parentKey;
+  const WindowTitle(this.parentWindow, {super.key});
+
+  final ResizableDraggableWindow parentWindow;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final window = ref.watch(windowProvider(key!));
     return SizedBox(
       height: 25,
       child: Row(
@@ -17,14 +17,14 @@ class WindowTitle extends ConsumerWidget {
           const SizedBox(width: 10),
           Expanded(
             child: GestureDetector(
-                // onPanUpdate: (movement) => widget.onWindowDragged(movement.delta.dx, movement.delta.dy),
-                // onPanUpdate: (details) => ref.read(windowControllerProvider.notifier).dragWindow(parentWindow, details.delta),
-                child: MouseRegion(cursor: SystemMouseCursors.move, child: Text(window.title))),
+              onPanUpdate: (details) => ref.read(windowsProvider).dragWindow(parentWindow, details.delta),
+              child: MouseRegion(cursor: SystemMouseCursors.move, child: Text(parentWindow.title)),
+            ),
           ),
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              //     onTap: () => ref.read(windowControllerProvider.notifier).minimizeWindow(parentWindow),
+              onTap: () => ref.read(windowsProvider).minimizeWindow(parentWindow),
               child: Container(
                 height: 25,
                 width: 32,
@@ -36,7 +36,7 @@ class WindowTitle extends ConsumerWidget {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () => ref.read(windowControllerProvider.notifier).toggleMaximizeWindow(parentKey),
+              onTap: () => ref.read(windowsProvider).maximizeWindow(parentWindow),
               child: Container(
                 height: 25,
                 width: 32,
@@ -51,7 +51,7 @@ class WindowTitle extends ConsumerWidget {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: () => ref.read(windowControllerProvider.notifier).removeWindow(parentKey),
+              onTap: () => ref.read(windowsProvider).removeWindow(parentWindow),
               child: Container(
                 height: 25,
                 width: 60,

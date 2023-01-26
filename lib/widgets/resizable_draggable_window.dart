@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:portfolio/controllers/window_controller.dart';
-import 'package:portfolio/models/desktop_icon.dart';
-import 'package:portfolio/models/enums.dart';
-import 'package:portfolio/widgets/window/title.dart';
+import 'package:portfolio/models/desktop_icons.dart';
+import 'package:portfolio/widgets/window_title.dart';
 
 class ResizableDraggableWindow extends ConsumerWidget {
-  ResizableDraggableWindow({super.key});
+  ResizableDraggableWindow(this.title, this.body, this.icon, this.orderNumber, {required super.key});
+  final String title;
+  final Widget body;
+  final DesktopIcon icon;
+  final int orderNumber;
+  double currentHeight = 400;
+  double currentWidth = 500;
+  double savedHeight = 0;
+  double savedWidth = 0;
+  double posX = 85;
+  double posY = 45;
+  WindowState prevWindowState = WindowState.NORMAL;
+  WindowState windowState = WindowState.NORMAL;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final windowController = ref.watch(windowControllerProvider.notifier);
-    final window = ref.watch(windowProvider(key! ));
+    ref.watch(windowsProvider);
     return Positioned(
-      top: window.posY  ,
-      left: window.posX,
+      top: posY,
+      left: posX,
       child: Offstage(
-        offstage: window.windowState == WindowState.MINIMIZED ? true : false,
+        offstage: windowState == WindowState.MINIMIZED ? true : false,
         child: GestureDetector(
-          onTap: () => ref.read(windowControllerProvider.notifier).sendToFront(key!),
+          onTap: () => ref.read(windowsProvider).toFront(this),
           child: Card(
             margin: EdgeInsets.zero,
             elevation: 8,
@@ -26,14 +36,14 @@ class ResizableDraggableWindow extends ConsumerWidget {
             child: AnimatedContainer(
               curve: Curves.easeInOutCubic,
               duration: const Duration(milliseconds: 120),
-              height: window.currentHeight,
-              width: window.currentWidth,
+              height: currentHeight,
+              width: currentWidth,
               child: Stack(
                 children: [
                   Column(
                     children: [
-                      WindowTitle(key!),
-                      Expanded(child: window.body),
+                      WindowTitle(this),
+                      Expanded(child: body),
                     ],
                   ),
                   Positioned(
@@ -41,7 +51,8 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     top: 0,
                     bottom: 0,
                     child: GestureDetector(
-                     // onHorizontalDragUpdate: (details) => windowController.onHorizontalDragRight(key!, details.delta),
+                      onHorizontalDragUpdate: (details) =>
+                          ref.watch(windowsProvider).onHorizontalDragRight(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeLeftRight,
                         opaque: true,
@@ -54,7 +65,8 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     top: 0,
                     bottom: 0,
                     child: GestureDetector(
-                   //   onHorizontalDragUpdate: (details) => windowController.onHorizontalDragLeft(this, details.delta),
+                      onHorizontalDragUpdate: (details) =>
+                          ref.watch(windowsProvider).onHorizontalDragLeft(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeLeftRight,
                         opaque: true,
@@ -67,7 +79,8 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     left: 0,
                     right: 0,
                     child: GestureDetector(
-                    //  onVerticalDragUpdate: (details) => windowController.onVerticalDragTop(this, details.delta),
+                      onVerticalDragUpdate: (details) =>
+                          ref.watch(windowsProvider).onVerticalDragTop(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpDown,
                         opaque: true,
@@ -80,7 +93,8 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     right: 0,
                     bottom: 0,
                     child: GestureDetector(
-                    //  onVerticalDragUpdate: (details) => windowController.onVerticalDragBottom(this, details.delta),
+                      onVerticalDragUpdate: (details) =>
+                          ref.watch(windowsProvider).onVerticalDragBottom(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpDown,
                         opaque: true,
@@ -92,7 +106,7 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     left: 0,
                     top: 0,
                     child: GestureDetector(
-                   //   onPanUpdate: (details) => windowController.onDragTopLeft(this, details.delta),
+                      onPanUpdate: (details) => ref.watch(windowsProvider).onDragTopLeft(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpLeftDownRight,
                         opaque: true,
@@ -104,7 +118,7 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     bottom: 0,
                     right: 0,
                     child: GestureDetector(
-                    //  onPanUpdate: (details) => windowController.onDragBottomRight(this, details.delta),
+                      onPanUpdate: (details) => ref.watch(windowsProvider).onDragBottomRight(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpLeftDownRight,
                         opaque: true,
@@ -116,7 +130,7 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     right: 0,
                     top: 0,
                     child: GestureDetector(
-                    //  onPanUpdate: (details) => windowController.onDragTopRight(this, details.delta),
+                      onPanUpdate: (details) => ref.watch(windowsProvider).onDragTopRight(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpRightDownLeft,
                         opaque: true,
@@ -128,7 +142,7 @@ class ResizableDraggableWindow extends ConsumerWidget {
                     left: 0,
                     bottom: 0,
                     child: GestureDetector(
-                    //  onPanUpdate: (details) => windowController.onDragBottomLeft(this, details.delta),
+                      onPanUpdate: (details) => ref.watch(windowsProvider).onDragBottomLeft(this, details.delta),
                       child: const MouseRegion(
                         cursor: SystemMouseCursors.resizeUpRightDownLeft,
                         opaque: true,

@@ -1,13 +1,11 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:portfolio/controllers/window_controller.dart';
-import 'package:portfolio/models/dock_icon.dart';
-import 'package:portfolio/widgets/window/resizable_draggable_window.dart';
+import 'package:portfolio/models/dock_icons.dart';
+import 'package:portfolio/widgets/resizable_draggable_window.dart';
 
 class DockItem extends ConsumerStatefulWidget {
-  const DockItem(this.dockIcon, {Key? key}) : super(key: key);
+  const DockItem(this.dockIcon, {super.key});
   final DockIcon dockIcon;
 
   @override
@@ -21,7 +19,7 @@ class _DockItemState extends ConsumerState<DockItem> {
   @override
   void initState() {
     super.initState();
-   // windows = ref.read(windowControllerProvider);
+    windows = ref.read(windowsProvider).windows;
   }
 
   void showOverlay() {
@@ -55,7 +53,7 @@ class _DockItemState extends ConsumerState<DockItem> {
                     GestureDetector(
                       onTap: () {
                         final window = windows.firstWhere((window) => window.key == key);
-                       // ref.read(windowControllerProvider.notifier).unminimizeWindow(window);
+                        ref.read(windowsProvider).unminimizeWindow(window);
                         onOverlay = false;
                         if (!onOverlay && entry != null) {
                           removeOverlay();
@@ -70,10 +68,10 @@ class _DockItemState extends ConsumerState<DockItem> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          key.toString() + " " + widget.dockIcon.icon.name,
+                          "$key ${widget.dockIcon.icon.name}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w200),
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w200),
                         ),
                       ),
                     ),
@@ -84,7 +82,7 @@ class _DockItemState extends ConsumerState<DockItem> {
         ),
       ),
     );
-    overlay!.insert(entry!);
+    overlay.insert(entry!);
   }
 
   void removeOverlay() {
@@ -98,13 +96,11 @@ class _DockItemState extends ConsumerState<DockItem> {
 
     return MouseRegion(
       onEnter: (event) {
-        ///onOverlay = true;
         if (entry == null) {
           showOverlay();
         }
       },
       onExit: (_) async {
-        // onOverlay = false;
         await Future.delayed(const Duration(milliseconds: 150), () {
           if (!onOverlay && entry != null) {
             removeOverlay();
@@ -118,8 +114,10 @@ class _DockItemState extends ConsumerState<DockItem> {
             margin: const EdgeInsets.symmetric(horizontal: 2),
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
             constraints: const BoxConstraints(maxHeight: 33, minHeight: 33, maxWidth: 100, minWidth: 30),
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.white30, width: 0.4), color: Colors.black26, borderRadius: BorderRadius.circular(5)),
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.white30, width: 0.4),
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(5)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,

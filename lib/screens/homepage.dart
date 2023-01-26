@@ -1,36 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:portfolio/screens/window.dart';
-import 'package:portfolio/widgets/dock.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:portfolio/widgets/main_dock.dart';
+import 'package:portfolio/widgets/windower.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class Homepage extends ConsumerWidget {
+  const Homepage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          fit: StackFit.expand,
-          children:  [
-            //   Desktop(),
-            //Windower(),
-
-            Window(
-              child: Container(
-               color: Colors.red,
-                child: SizedBox.square(
-                  dimension: 200,
-                  child: Text(
-                  	'aoe',
-                  	style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-
-            Dock(),
-          ],
-        ),
+      body: Stack(
+        children: const [
+          Windower(),
+          MainDock(),
+        ],
       ),
     );
   }

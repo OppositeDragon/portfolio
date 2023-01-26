@@ -1,182 +1,144 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:portfolio/models/desktop_icon.dart';
-import 'package:portfolio/models/enums.dart';
-import 'package:portfolio/models/window_properties.dart';
-import 'package:portfolio/widgets/window/resizable_draggable_window.dart';
+import 'package:portfolio/models/desktop_icons.dart';
+import 'package:portfolio/widgets/resizable_draggable_window.dart';
 
-final windowProvider = Provider.family<WindowProperties, Key>((ref, key) {
-  final windowProps = ref.watch(windowControllerProvider);
-  return windowProps.firstWhere((element) => element.key == key);
-});
+final windowsProvider = ChangeNotifierProvider((ref) => WindowsController());
 
-final windowControllerProvider = StateNotifierProvider<WindowController, List<WindowProperties>>((ref) {
-  final List<WindowProperties> state = [];
-  return WindowController(state);
-});
+enum WindowState { MAXIMIZED, MINIMIZED, NORMAL }
 
-class WindowController extends StateNotifier<List<WindowProperties>> {
-  WindowController(super.state);
-  Offset _windowPosition = Offset.zero;
+class WindowsController with ChangeNotifier {
+  final List<ResizableDraggableWindow> _windows = [];
+  late Offset _windowPosition = Offset.zero;
   int orderNumber = 0;
-  void createWindow(String title, Widget body, DesktopIcon icon) {
-    state = [
-      ...state,
-      WindowProperties(
-        title: title,
-        body: body,
-        icon: icon,
-        orderNumber: orderNumber,
-        key: UniqueKey(),
-      ),
-    ];
+  void createNewWindow(String title, Widget body, DesktopIcon icon) {
+    ResizableDraggableWindow resizableDraggableWindow = ResizableDraggableWindow(
+      title,
+      body,
+      icon,
+      orderNumber,
+      key: UniqueKey(),
+    );
+    _windows.add(resizableDraggableWindow);
     orderNumber++;
+    notifyListeners();
   }
 
-  void sendToFront(Key key) {
-    state = [
-      for (final window in state)
-        if (window.key != key) window,
-      state.firstWhere((element) => element.key == key),
-    ];
+  void toFront(ResizableDraggableWindow resizableDraggableWindow) {
+    _windows.remove(resizableDraggableWindow);
+    _windows.add(resizableDraggableWindow);
+    notifyListeners();
   }
 
-  void removeWindow(Key key) {
-    state = [
-      for (final window in state)
-        if (window.key != key) window,
-    ];
+  void removeWindow(ResizableDraggableWindow resizableDraggableWindow) {
+    _windows.remove(resizableDraggableWindow);
+    notifyListeners();
   }
 
-  void toggleMaximizeWindow(Key key) {
-    WindowProperties window = state.firstWhere((element) => element.key == key);
-    if (window.windowState == WindowState.MAXIMIZED) {
-      window = window.copyWith(
-          currentHeight: window.savedHeight,
-          currentWidth: window.savedWidth,
-          prevWindowState: WindowState.NORMAL,
-          windowState: WindowState.NORMAL,
-          posX: 100,
-          posY: 100);
+  void dragWindow(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    if (resizableDraggableWindow.windowState == WindowState.MAXIMIZED) {
+      maximizeWindow(resizableDraggableWindow);
+    }
+    resizableDraggableWindow.posX += delta.dx;
+    resizableDraggableWindow.posY += delta.dy;
+    _windowPosition = Offset(resizableDraggableWindow.posX, resizableDraggableWindow.posY);
+    notifyListeners();
+  }
+
+  void maximizeWindow(ResizableDraggableWindow resizableDraggableWindow) {
+    if (resizableDraggableWindow.windowState == WindowState.MAXIMIZED) {
+      resizableDraggableWindow.currentHeight = resizableDraggableWindow.savedHeight;
+      resizableDraggableWindow.currentWidth = resizableDraggableWindow.savedWidth;
+      resizableDraggableWindow.prevWindowState = WindowState.NORMAL;
+      resizableDraggableWindow.windowState = WindowState.NORMAL;
+      dragWindow(resizableDraggableWindow, const Offset(100, 100));
     } else {
       Size size = MediaQueryData.fromWindow(WidgetsBinding.instance.window).size;
-      window.copyWith(
-          posX: 0,
-          posY: 0,
-          savedHeight: window.currentHeight,
-          savedWidth: window.currentWidth,
-          currentHeight: size.height - 57,
-          currentWidth: size.width,
-          prevWindowState: WindowState.MAXIMIZED,
-          windowState: WindowState.MAXIMIZED);
+      dragWindow(resizableDraggableWindow, Offset(-resizableDraggableWindow.posX, -resizableDraggableWindow.posY));
+      resizableDraggableWindow.savedHeight = resizableDraggableWindow.currentHeight;
+      resizableDraggableWindow.savedWidth = resizableDraggableWindow.currentWidth;
+      resizableDraggableWindow.currentHeight = size.height - 57;
+      resizableDraggableWindow.currentWidth = size.width;
+      resizableDraggableWindow.prevWindowState = WindowState.MAXIMIZED;
+      resizableDraggableWindow.windowState = WindowState.MAXIMIZED;
     }
-    state = [
-      for (final windowProp in state)
-        if (windowProp.key == key) window else windowProp,
-    ];
+    notifyListeners();
   }
 
-  // void applyChangesToWindow(Key key) {
-  //   debugPrint('state: $state');
-  //   state = [
-  //     for (final window in state)
-  //       if (window == key) key else window,
-  //   ];
-  //   debugPrint('state: $state');
-  // }
+  void minimizeWindow(ResizableDraggableWindow resizableDraggableWindow) {
+    if (resizableDraggableWindow.windowState == WindowState.MINIMIZED) {
+      unminimizeWindow(resizableDraggableWindow);
+    } else {
+      resizableDraggableWindow.windowState = WindowState.MINIMIZED;
+      notifyListeners();
+    }
+  }
 
-// //TODO: fix circular calls from dragWindow to toggleMaximizeWindow
-//   void dragWindow(Key key, Offset delta) {
-//     debugPrint('dragWindow(x:${window.posX} y:${window.posY}, $delta))');
-//     if (key.windowState == WindowState.MAXIMIZED) {
-//       toggleMaximizeWindow(key);
-//     }
-//     key.copyWith(
-//       posX: key.posX + delta.dx,
-//       posY: key.posY + delta.dy,
-//     );
-//     _windowPosition = Offset(key.posX, key.posY);
-//     applyChangesToWindow(key);
-//   }
+  void unminimizeWindow(ResizableDraggableWindow resizableDraggableWindow) {
+    toFront(resizableDraggableWindow);
+    resizableDraggableWindow.windowState = resizableDraggableWindow.prevWindowState;
+    notifyListeners();
+  }
 
-//   void unminimizeWindow(Key key) {
-//     sendToFront(key);
-//     key.copyWith(windowState: key.prevWindowState);
-//     applyChangesToWindow(key);
-//   }
+  void onHorizontalDragRight(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    resizableDraggableWindow.currentWidth += delta.dx;
+    if (resizableDraggableWindow.currentWidth <= 250) {
+      resizableDraggableWindow.currentWidth = 250;
+    } else {
+      notifyListeners();
+    }
+  }
 
-//   void minimizeWindow(Key key) {
-//     if (key.windowState == WindowState.MINIMIZED) {
-//       unminimizeWindow(key);
-//     } else {
-//       key.copyWith(windowState: WindowState.MINIMIZED);
-//       applyChangesToWindow(key);
-//     }
-//   }
+  void onVerticalDragBottom(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    resizableDraggableWindow.currentHeight += delta.dy;
+    if (resizableDraggableWindow.currentHeight <= 250) {
+      resizableDraggableWindow.currentHeight = 250;
+    } else {
+      notifyListeners();
+    }
+  }
 
-//
-//   void onHorizontalDragRight(Key key, Offset delta) {
-//     // if (key.currentWidth == 250) {
-//     //   return;
-//     // }
-//     key.copyWith(currentWidth: key.currentWidth + delta.dx);
+  void onHorizontalDragLeft(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    resizableDraggableWindow.currentWidth -= delta.dx;
+    if (resizableDraggableWindow.currentWidth > 250) {
+      dragWindow(resizableDraggableWindow, delta);
+    } else {
+      resizableDraggableWindow.currentWidth = 250;
+    }
+  }
 
-//     if (key.currentWidth < 250) {
-//       key.copyWith(currentWidth: 250);
-//     }
-//     applyChangesToWindow(key);
-//   }
+  void onVerticalDragTop(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    resizableDraggableWindow.currentHeight -= delta.dy;
+    if (resizableDraggableWindow.currentHeight > 250) {
+      dragWindow(resizableDraggableWindow, delta);
+    } else {
+      resizableDraggableWindow.currentHeight = 250;
+    }
+  }
 
-//   void onVerticalDragBottom(Key key, Offset delta) {
-//     // if (key.currentHeight == 250) {
-//     //   return;
-//     // }
+  void onDragTopLeft(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    onHorizontalDragLeft(resizableDraggableWindow, Offset(delta.dx, 0));
+    onVerticalDragTop(resizableDraggableWindow, Offset(0, delta.dy));
+  }
 
-//     double height = key.currentHeight + delta.dy;
-//     if (height < 250) {
-//       height = 250;
-//     }
-//     key.copyWith(currentHeight: height);
-//     applyChangesToWindow(key);
-//   }
+  void onDragBottomRight(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    onHorizontalDragRight(resizableDraggableWindow, Offset(delta.dx, 0));
+    onVerticalDragBottom(resizableDraggableWindow, Offset(0, delta.dy));
+  }
 
-//   void onHorizontalDragLeft(Key key, Offset delta) {
-//     double width = key.currentWidth - delta.dx;
-//     if (width > 250) {
-//       dragWindow(key, delta);
-//     } else {
-//       key.copyWith(currentWidth: 250);
-//       applyChangesToWindow(key);
-//     }
-//   }
+  void onDragTopRight(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    onHorizontalDragRight(resizableDraggableWindow, Offset(delta.dx, 0));
+    onVerticalDragTop(resizableDraggableWindow, Offset(0, delta.dy));
+  }
 
-//   void onVerticalDragTop(Key key, Offset delta) {
-//     double height = key.currentHeight - delta.dy;
-//     if (height > 250) {
-//       dragWindow(key, delta);
-//     } else {
-//       key.copyWith(currentHeight: 250);
-//       applyChangesToWindow(key);
-//     }
-//   }
+  void onDragBottomLeft(ResizableDraggableWindow resizableDraggableWindow, Offset delta) {
+    onHorizontalDragLeft(resizableDraggableWindow, Offset(delta.dx, 0));
+    onVerticalDragBottom(resizableDraggableWindow, Offset(0, delta.dy));
+  }
 
-//   void onDragTopLeft(Key key, Offset delta) {
-//     onHorizontalDragLeft(key, Offset(delta.dx, 0));
-//     onVerticalDragTop(key, Offset(0, delta.dy));
-//   }
+  List<ResizableDraggableWindow> get windows {
+    return _windows;
+  }
 
-//   void onDragBottomRight(Key key, Offset delta) {
-//     onHorizontalDragRight(key, Offset(delta.dx, 0));
-//     onVerticalDragBottom(key, Offset(0, delta.dy));
-//   }
-
-//   void onDragTopRight(Key key, Offset delta) {
-//     onHorizontalDragRight(key, Offset(delta.dx, 0));
-//     onVerticalDragTop(key, Offset(0, delta.dy));
-//   }
-
-//   void onDragBottomLeft(Key key, Offset delta) {
-//     onHorizontalDragLeft(key, Offset(delta.dx, 0));
-//     onVerticalDragBottom(key, Offset(0, delta.dy));
-//   }
+  Offset get windowPosition => _windowPosition;
 }

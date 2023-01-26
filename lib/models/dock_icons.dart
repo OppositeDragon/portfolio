@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:portfolio/models/desktop_icon.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:portfolio/models/desktop_icons.dart';
 
 class DockIcon {
   late DesktopIcon icon;
