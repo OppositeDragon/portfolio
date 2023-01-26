@@ -1,4 +1,4 @@
-enum FileType { FOLDER, IMAGE, VIDEO, MUSIC, PDF, HTML, TABLE, ACCORDION, REPORT }
+enum FileType { FOLDER, IMAGE, VIDEO, MUSIC, PDF, HTML, TABLE, ACCORDION, REPORT, ENCRYPT }
 
 class DesktopIcon {
   late FileType fileType;
@@ -7,10 +7,3 @@ class DesktopIcon {
   DesktopIcon(this.fileType, this.iconPath, this.name);
 }
 
-List<DesktopIcon> iconsDesk = [
-  DesktopIcon(FileType.PDF, 'assets/icons/pdf-file.png', 'PDF'),
-  DesktopIcon(FileType.ACCORDION, 'assets/icons/dropdown-arrow.png', 'Lista desplegable'),
-  DesktopIcon(FileType.REPORT, 'assets/icons/report.png', 'Reporte'),
-  DesktopIcon(FileType.TABLE, 'assets/icons/table.png', 'Tabla'),
-  DesktopIcon(FileType.IMAGE, 'assets/icons/image.png', 'Imagen'),
-];

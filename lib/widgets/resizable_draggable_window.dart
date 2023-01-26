@@ -5,13 +5,21 @@ import 'package:portfolio/models/desktop_icons.dart';
 import 'package:portfolio/widgets/window_title.dart';
 
 class ResizableDraggableWindow extends ConsumerWidget {
-  ResizableDraggableWindow(this.title, this.body, this.icon, this.orderNumber, {required super.key});
+  ResizableDraggableWindow(
+    this.title,
+    this.body,
+    this.icon,
+    this.orderNumber, {
+    this.currentHeight = 400,
+    this.currentWidth = 500,
+    required super.key,
+  });
   final String title;
   final Widget body;
   final DesktopIcon icon;
   final int orderNumber;
-  double currentHeight = 400;
-  double currentWidth = 500;
+  double currentHeight;
+  double currentWidth;
   double savedHeight = 0;
   double savedWidth = 0;
   double posX = 85;

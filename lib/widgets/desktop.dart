@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:portfolio/controllers/default_application_controller.dart';
 import 'package:portfolio/controllers/window_controller.dart';
+import 'package:portfolio/data/dummy_data.dart';
 import 'package:portfolio/models/desktop_icons.dart';
 
 class Desktop extends ConsumerWidget {
@@ -26,7 +27,7 @@ class Desktop extends ConsumerWidget {
             direction: Axis.vertical,
             runAlignment: WrapAlignment.start,
             verticalDirection: VerticalDirection.down,
-            children: iconsDesk.map((e) {
+            children: iconsDeskData.map((e) {
               return SizedBox(
                 width: 80,
                 height: 100,

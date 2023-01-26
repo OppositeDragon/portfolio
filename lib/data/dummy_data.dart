@@ -7,6 +7,7 @@ List<DesktopIcon> iconsDeskData = [
   DesktopIcon(FileType.REPORT, 'assets/icons/report.png', 'Reporte'),
   DesktopIcon(FileType.TABLE, 'assets/icons/table.png', 'Tabla'),
   DesktopIcon(FileType.IMAGE, 'assets/icons/image.png', 'Imagen'),
+  DesktopIcon(FileType.ENCRYPT, 'assets/icons/encryption.png', 'Encriptar'),
 ];
 
 final List<ClientForPanel> clientsData = [

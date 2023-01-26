@@ -19,6 +19,7 @@ class WindowsController with ChangeNotifier {
       orderNumber,
       key: UniqueKey(),
     );
+    if (icon.fileType == FileType.ENCRYPT) {resizableDraggableWindow.currentHeight = 600;}
     _windows.add(resizableDraggableWindow);
     orderNumber++;
     notifyListeners();
