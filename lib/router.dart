@@ -7,20 +7,21 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     routes: <RouteBase>[
       GoRoute(
-          path: '/',
-          pageBuilder: (context, state) {
-            return CustomTransitionPage(
-                key: state.pageKey,
-                child: const HomePage(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  // Change the opacity of the screen using a Curve based on the the animation's
-                  // value
-                  return FadeTransition(
-                    opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
-                    child: child,
-                  );
-                });
-          }),
+        path: '/',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const Homepage(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              // Change the opacity of the screen using a Curve based on the the animation's value
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
     ],
   );
 });
