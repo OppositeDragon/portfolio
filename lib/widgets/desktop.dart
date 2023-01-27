@@ -40,9 +40,7 @@ class Desktop extends ConsumerWidget {
                     children: [
                       GestureDetector(
                         onDoubleTap: e.fileType == FileType.GITHUB
-                            ? () {
-                                launchUrl(Uri.https('github.com', '/OppositeDragon'), mode: LaunchMode.platformDefault);
-                              }
+                            ? () => launchUrl(Uri.https('github.com', '/OppositeDragon'), mode: LaunchMode.platformDefault)
                             : () => ref.read(windowsProvider).createNewWindow(
                                 e.name.toString(), ref.read(defaultAppProvider).defaulApp(e.fileType), e),
                         child: MouseRegion(
