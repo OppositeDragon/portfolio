@@ -4,6 +4,7 @@ import 'package:portfolio/controllers/default_application_controller.dart';
 import 'package:portfolio/controllers/window_controller.dart';
 import 'package:portfolio/data/dummy_data.dart';
 import 'package:portfolio/models/desktop_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Desktop extends ConsumerWidget {
   const Desktop({super.key});
@@ -38,9 +39,12 @@ class Desktop extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
-                        onDoubleTap: () => ref
-                            .read(windowsProvider)
-                            .createNewWindow(e.name.toString(), ref.read(defaultAppProvider).defaulApp(e.fileType), e),
+                        onDoubleTap: e.fileType == FileType.GITHUB
+                            ? () {
+                                launchUrl(Uri.https('github.com', '/OppositeDragon'), mode: LaunchMode.platformDefault);
+                              }
+                            : () => ref.read(windowsProvider).createNewWindow(
+                                e.name.toString(), ref.read(defaultAppProvider).defaulApp(e.fileType), e),
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: Image.asset(

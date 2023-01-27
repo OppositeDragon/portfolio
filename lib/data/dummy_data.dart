@@ -2,12 +2,13 @@ import 'package:portfolio/models/client.dart';
 import 'package:portfolio/models/desktop_icons.dart';
 
 List<DesktopIcon> iconsDeskData = [
-  DesktopIcon(FileType.PDF, 'assets/icons/pdf-file.png', 'PDF'),
+  DesktopIcon(FileType.PDF, 'assets/icons/cv.png', 'Curriculum'),
   DesktopIcon(FileType.ACCORDION, 'assets/icons/dropdown-arrow.png', 'Lista desplegable'),
   DesktopIcon(FileType.REPORT, 'assets/icons/report.png', 'Reporte'),
   DesktopIcon(FileType.TABLE, 'assets/icons/table.png', 'Tabla'),
   DesktopIcon(FileType.IMAGE, 'assets/icons/image.png', 'Imagen'),
   DesktopIcon(FileType.ENCRYPT, 'assets/icons/encryption.png', 'Encriptar'),
+  DesktopIcon(FileType.GITHUB, 'assets/icons/link.png', 'My Perfil GitHub '),
 ];
 
 final List<ClientForPanel> clientsData = [

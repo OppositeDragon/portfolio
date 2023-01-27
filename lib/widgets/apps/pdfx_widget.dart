@@ -11,7 +11,7 @@ class PdfWidget extends ConsumerStatefulWidget {
 
 class _PdfWidgetState extends ConsumerState<PdfWidget> {
   final pdfPinchController = PdfControllerPinch(
-    document: PdfDocument.openAsset('assets/docs/pdf-sample.pdf'),
+    document: PdfDocument.openAsset('assets/docs/od-cv.pdf'),
   );
 
   @override
