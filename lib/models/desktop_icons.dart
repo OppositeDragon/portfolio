@@ -1,4 +1,4 @@
-enum FileType { FOLDER, IMAGE, VIDEO, MUSIC, PDF, HTML, TABLE, ACCORDION, REPORT, ENCRYPT, GITHUB }
+enum FileType { FOLDER, IMAGE, VIDEO, MUSIC, PDF, HTML, TABLE, ACCORDION, REPORT, ENCRYPT, GITHUB, CONTACT }
 
 class DesktopIcon {
   late FileType fileType;
@@ -6,4 +6,3 @@ class DesktopIcon {
   late String name;
   DesktopIcon(this.fileType, this.iconPath, this.name);
 }
-

@@ -8,7 +8,8 @@ List<DesktopIcon> iconsDeskData = [
   DesktopIcon(FileType.TABLE, 'assets/icons/table.png', 'Table'),
   DesktopIcon(FileType.IMAGE, 'assets/icons/image.png', 'Image'),
   DesktopIcon(FileType.ENCRYPT, 'assets/icons/encryption.png', 'Encryption'),
-  DesktopIcon(FileType.GITHUB, 'assets/icons/link.png', 'My GitHub Profile '),
+  DesktopIcon(FileType.GITHUB, 'assets/icons/link.png', 'Go to my GitHub profile '),
+  DesktopIcon(FileType.CONTACT, 'assets/icons/email.png', 'Contact Me'),
 ];
 
 final List<ClientForPanel> clientsData = [
